@@ -1,4 +1,3 @@
-import asyncio
 from asyncio import Event
 from typing import Tuple, Type, Callable
 
@@ -18,12 +17,11 @@ class WSMProgress (BaseWSModule):
                                                  'timestamp': state[2]
                                            })
         self.state_holder.increment_states_served_on_instance(instance_id, [state])
-        try:
-            await self.get_instance_ws(instance_id).send(res)
-        except (BaseException, Exception):
-            await asyncio.sleep(0)
+        await self.get_instance_ws(instance_id).send(res)
 
 
+    def __init__(self, get_instance_ws: Callable[[int], WebSocketServerProtocol], trigger: Event, state_holder: Type[BaseStateHolder], *args, **kwargs):
+        super().__init__(get_instance_ws, trigger, state_holder)
 
 
 
