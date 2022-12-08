@@ -32,8 +32,7 @@ class UpdateInternalDMarket(BasicController):
                 if int(v) > Config.DMarket.Offering.Constrains.MAX_SINGLE_MAX_LIMIT:
                     bad_params.append((k, f'should not be higher than '
                                           f'{Config.DMarket.Offering.Constrains.MAX_SINGLE_MAX_LIMIT}.'
-                                          f'This can be incresead MAS O OOF TA A TESTAR E EU NÃO QUERO QUEIMAR '
-                                          f'AS PROXIES TODAS, MT MENOS O PROCESSAMENTO'))
+                                          f'This can be incresead. Ask webmaster.'))
 
             elif k == "offset":
                 if v > jbody.get('maxLimit'):
@@ -122,12 +121,15 @@ class UpdateInternalDMarket(BasicController):
 
                 R.RH.DMData.offerbook.saveToCache(testing=kwargs.get('testing'))
                 R.RH.DMData.unlock()
-
-            except (Exception, BaseException):
+                print(f"Update in: {time.time()}")
+            except (Exception, BaseException) as ex:
                 R.RH.DMData = old_data
+                print(ex)
                 print('No changes took place to the prod data."')
+
+
         Thread(target=detach, daemon=True).start()
-        print(f"Update in: {time.time()}")
+
 
     @staticmethod
     def GET(R: Router, **kwargs):
