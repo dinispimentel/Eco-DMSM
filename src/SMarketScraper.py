@@ -41,23 +41,38 @@ class SteamMarketScraper:
 
     @staticmethod
     def itemNameIDIt(ob: OfferBook, appID="730", PO: ProxyOrchestrator = None,
-                     progress_trigger: Callable[[float, str, int], None] = None,
-                     annotateImediately: bool = True, useRedis=True):
+                     progress_trigger: Callable[[float], None] = None,
+                     annotateImediately: bool = True, useRedis=True, showUses=True):
         thread_pool = []
         to_cache = {}
         allflags, fm = ob.containsFlags([ob.Flags.DMARKET_OFFERS_RECEIVED])
-
+        global redis_uses
+        redis_uses = 0
+        global proxy_uses
+        proxy_uses = 0
         if not allflags:
             print(f"Missing flags: {ob.Flags.convertFlagNumbersToStrs(fm)} ")
             raise SteamMarketScraper.Exceptions.MissingFlagsError
 
-        def __dispatchSteamNameId(offerIdx, proxy_orchestrator: ProxyOrchestrator, retries=0, annotateToCache=None):
+        def __dispatchSteamNameId(offerIdx, proxy_orchestrator: ProxyOrchestrator, retries=0, annotateToCache=None,
+                                  uses: Callable[[int], None] = None):
+
+            def trigger_progress():
+                if progress_trigger:
+                    progress_trigger( # (offerIdx + 1) / len(ob.offers),
+#                                     f'{offerIdx + 1} Offers item named of {len(ob.offers)}',
+                                     time.time())
 
             if useRedis:
                 rcid = RedisCache.getItemNameID(ob.offers[offerIdx].title)
                 if rcid:
                     ob.offers[offerIdx].setSteamNameId(rcid)
-                    return
+
+                    trigger_progress()
+                    if uses:
+                        uses(1)
+                    return # importante
+
 
             if retries < Config.Steam.ItemNaming.MAX_RETRIES:
 
@@ -78,16 +93,24 @@ class SteamMarketScraper:
                     annotateToCache(ob.offers[offerIdx].title, inid)
                 else:
                     RedisCache.saveItemNameIDs({ob.offers[offerIdx].title: inid})
+
                 ob.offers[offerIdx].setSteamNameId(inid)
-                if progress_trigger:
-                    progress_trigger((offerIdx+1)/len(ob.offers), f'{offerIdx+1} Offers item named of {len(ob.offers)}',
-                                     int(time.time()))
+                if uses:
+                    uses(0)
+                trigger_progress()
 
         updateToCache = lambda t, inid: to_cache.update({
             t: inid
         })
-
+        def uses(method):
+            global redis_uses, proxy_uses
+            if method == 1:
+                redis_uses += 1
+            else:
+                proxy_uses += 1
         kwargs = ({} if annotateImediately is True else {"annotateToCache": updateToCache})
+        if showUses:
+            kwargs.update({"uses": uses})
 
         for i in range(0, len(ob.offers)):
             thread_pool.append(Thread(target=__dispatchSteamNameId, args=(i, PO), kwargs=kwargs))
@@ -104,7 +127,7 @@ class SteamMarketScraper:
 
         # cache what ins't cached yet
 
-
+        print(f'USES: #Proxy: {proxy_uses} | #Redis: {redis_uses}')
 
         ob.addFlag(ob.Flags.STEAM_ITEM_NAMED)
 
