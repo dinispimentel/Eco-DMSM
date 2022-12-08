@@ -35,25 +35,28 @@ class ItemNaming(BasicController):
         def detach():
             try:
                 R.RH.DMData.lock(status="Item Naming...")
-
                 wsi = WSInterface()
                 from src.WSModules.WSMProgress import WSMProgress
                 from src.StateHolder.Progress import Progress
                 from src.WSModules.WSMProxyHealth import WSMProxyHealth
                 from src.StateHolder.ProxyHealth import ProxyHealth
 
-                wsi.serve([(WSMProgress, Progress, None, None),
+                wsi.serve([(WSMProgress, Progress, [len(ob.offers)], None),
                            (WSMProxyHealth, ProxyHealth, None, None)])
                 R.RH.PO.implementUpdateTracking(wsi.getModule(WSMProxyHealth).state_holder.update)
 
                 SteamMarketScraper.itemNameIDIt(ob, PO=R.RH.PO, progress_trigger=wsi.getModule(WSMProgress).state_holder.update,
                                                 annotateImediately=Config.Steam.ItemNaming.ANNOTATE_IMMEDIATELY,
-                                                useRedis=False)
+                                                useRedis=True)
+                wsi.getModule(WSMProgress).state_holder.force_end()
+
                 ob.saveToCache(testing=False)
+                R.RH.DMData.lock("Unbinding WS Socket...")
                 wsi.quit()
 
                 R.RH.DMData.unlock()
-            except (Exception, BaseException):
+            except (Exception, BaseException) as ex:
+                print(ex)
                 R.RH.DMData.unlock()
         Thread(target=detach, daemon=True).start()
 

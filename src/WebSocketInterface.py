@@ -12,6 +12,7 @@ from websockets.legacy.server import WebSocketServerProtocol
 
 from src.StateHolder.BaseStateHolder import BaseStateHolder
 from src.WSModules.BaseWSModule import BaseWSModule
+from src.config import Config
 
 
 class WSInterface:
@@ -23,7 +24,7 @@ class WSInterface:
 
 
     def serve(self, modules_to_load: List[Tuple[Type[BaseWSModule], Type[BaseStateHolder], Optional[Tuple],
-    Optional[Mapping]]], host="127.0.0.1", port=4000):
+    Optional[Mapping]]], host=Config.ENV.LOCAL_IP, port=4000):
         for t in modules_to_load:
             module = t[0]
             state_holder = t[1]
@@ -45,12 +46,12 @@ class WSInterface:
 
         def _servingThreadFunc():
 
-            loop = asyncio.new_event_loop()
-            loop.run_until_complete(self._serve(modules_to_load,host=host, port=port,))
+
+            asyncio.run(self._serve(modules_to_load,host=host, port=port))
 
         self.thread = Thread(target=_servingThreadFunc, daemon=True)
         self.thread.start()
-
+            # asyncio.run(self._serve(modules_to_load, host=host, port=port))
 
 
         # loop.run_until_complete(coroutine)
@@ -61,7 +62,6 @@ class WSInterface:
     async def _serve(self, modules_to_load: List[Tuple[Type[BaseWSModule], Type[BaseStateHolder], Optional[Tuple],
     Optional[Mapping]]],
                      host="127.0.0.1", port=4000):
-
 
         async def handler(ws, path):
 
@@ -106,14 +106,20 @@ class WSInterface:
 
                 # await ws.send(WSInterface._create_response(True, {'progress': 0.5, 'progress_details': "Staled"}))
 
-        print("Starting to serve")
-        async with websockets.serve(handler, host, port):
-            while not self.kill_event.is_set():
-                await asyncio.sleep(0)
-
+        print("Starting serve")
+        try:
+            async with websockets.serve(handler, host, port):
+                while not self.kill_event.is_set():
+                    await asyncio.sleep(0)
+                self.unbinded = True
             # await self.kill_event.wait()
+        except TypeError as te:
+            print("TE", te)
+        except (BaseException, Exception) as ex:
+            print("EX", ex)
+        finally:
             self.unbinded = True
-        print("Ending serve")
+            print("Ending serve")
 
     def __init__(self, connects=None):
         self.connects: Dict[int, WebSocketServerProtocol] = connects or {}
@@ -121,7 +127,7 @@ class WSInterface:
         self.kill_event = asyncio.Event()
         self.unbinded = False
         self.modules: List[BaseWSModule] = []
-
+        self.closing_all = False
     async def close_all_instances(self):
 
         for w in self.connects.values():
@@ -132,20 +138,23 @@ class WSInterface:
     def quit(self):
         # self.thread = None
         print("Quitting WS")
+
+        print("WS Stopping Modules")
         for m in self.modules:
             try:
                 loop = asyncio.get_event_loop()
             except:
                 loop = asyncio.new_event_loop()
             loop.run_until_complete(m.sendPastStates())
-        print("WS Stopping Modules")
+
         self.stopModules()
         self.kill_event.set()
         # self.thread.join()
-        # while not self.unbinded:
-        #     time.sleep(0.2)
-        #     print("Waiting WS Unbind")
-        print("WS Exited")
+        while not self.unbinded:
+            self.kill_event.set()
+            time.sleep(0.2)
+            print("Waiting WS Unbind")
+        print("WS Exiting...")
 
 
     def loadModule(self, module: Type[BaseWSModule], state_holder: Type[BaseStateHolder],
