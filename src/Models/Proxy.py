@@ -46,6 +46,7 @@ class Proxy:
             self.forbidden_strikes += 1
         if strike_type == "too_many_requests":
             self.too_many_requests_strikes += 1
+            print(self.getIPPORT() + "| TNRS: " + str(self.too_many_requests_strikes))
         if strike_type == "fatal":
             self.fatal_strikes += 1
 

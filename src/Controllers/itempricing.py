@@ -55,11 +55,14 @@ class ItemPricing(BasicController):
 
 
 
-                wsi.serve([(WSMProgress, Progress, None, None),
+                wsi.serve([(WSMProgress, Progress, [len(ob.offers)], None),
                            (WSMProxyHealth, ProxyHealth, None, None)])
                 R.RH.PO.implementUpdateTracking(wsi.getModule(WSMProxyHealth).state_holder.update)
                 SteamMarketScraper.priceSkins(ob, steam_currency=steam_cur,
-                                              PO=R.RH.PO, max_histogram_entries=(jbody.get('max_histogram_entries') or 5))
+                                              PO=R.RH.PO, max_histogram_entries=(jbody.get('max_histogram_entries') or 5),
+                                              progress_trigger=wsi.getModule(WSMProgress).state_holder.update)
+                wsi.getModule(WSMProgress).state_holder.force_end()
+                R.RH.DMData.lock("Unbinding WS Socket...")
                 wsi.quit()
                 R.RH.DMData.unlock()
 

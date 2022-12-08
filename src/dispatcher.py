@@ -27,11 +27,12 @@ class Dispatcher:
             print(f'Tentando request com: {_ProxyToUse.getIPPORT()}')
             res = the_request(_ProxyToUse)  # TODO ISTO TEM DE CHEGAR LA ABAIXO
             print(res.status_code)
-            if res:
-                if res.status_code:
+            if res is not None:
+                if res.status_code is not None:
                     if res.status_code == 429:
                         _ProxyToUse.strike(strike_type="too_many_requests")
                         _ProxyToUse.lock(Config.Proxying.TOO_MANY_REQUESTS_STACKABLE_LOCK*_ProxyToUse.too_many_requests_strikes)
+                        print("TMRL: " + str(Config.Proxying.TOO_MANY_REQUESTS_STACKABLE_LOCK*_ProxyToUse.too_many_requests_strikes))
                         if _ProxyToUse.striked(specific_strike="too_many_requests"):
                             PO.removeBrokenProxy(_ProxyToUse)
                         return Dispatcher.dispatch_proxified(the_request, PO)

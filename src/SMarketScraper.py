@@ -132,7 +132,8 @@ class SteamMarketScraper:
         ob.addFlag(ob.Flags.STEAM_ITEM_NAMED)
 
     @staticmethod
-    def priceSkins(ob: OfferBook, steam_currency=1, PO: ProxyOrchestrator = None, max_histogram_entries=None):
+    def priceSkins(ob: OfferBook, steam_currency=1, PO: ProxyOrchestrator = None, max_histogram_entries=None,
+                   progress_trigger: Callable[[float], None]=None):
         thread_pool = []
         allflags, fm = ob.containsFlags([ob.Flags.STEAM_ITEM_NAMED])
         dict_itnid_histogram = {}  # int: Histogram
@@ -141,11 +142,17 @@ class SteamMarketScraper:
             raise SteamMarketScraper.Exceptions.MissingFlagsError
 
         # DONE:// ADICIONAR CACHE (SOMENTE INTERIOR DA FUNÇÃO) PARA PRICE DAS MESMAS SKINS (DOS MESMOS STEAM NAME ID)
-
+        global pricing_saved
+        pricing_saved = 0
+        def psavedpp():
+            global pricing_saved
+            pricing_saved += 1
         def __dispatchSkinPricing(offerIdx, poo: ProxyOrchestrator, retries=0):
+
 
             if ob.offers[offerIdx].steam_name_id in list(dict_itnid_histogram.keys()):
                 ob.offers[offerIdx].histogram = dict_itnid_histogram[ob.offers[offerIdx].steam_name_id]
+                psavedpp()
             else:
                 res = Dispatcher.requestSteamOfferBooks(ob.offers[offerIdx].steam_name_id, steam_currency=steam_currency,
                                                         proxy_orchestrator=poo)
@@ -165,6 +172,8 @@ class SteamMarketScraper:
                                                                               currency=CURRENCIES_STEAM
                                                                               .get(str(steam_currency)))
                 dict_itnid_histogram.update({ob.offers[offerIdx].steam_name_id: ob.offers[offerIdx].histogram})
+            if progress_trigger:
+                progress_trigger(time.time())
             ob.offers[offerIdx].sm_price = Price(ob.offers[offerIdx].histogram.bid,  # preço mais alto
                                                  # que o comprador compra
                                                  ob.offers[offerIdx].histogram.currency)
@@ -176,5 +185,5 @@ class SteamMarketScraper:
                      Config.Steam.SkinPricing.DELAY_CONFIG)
 
         T.dispatch(lambda s, e: print(f'Dispatched {s}->{e} <{len(ob.offers)}>'))
-
+        print("Pricing saved: " + str(pricing_saved))
         ob.addFlag(ob.Flags.STEAM_MARKET_PRICED)

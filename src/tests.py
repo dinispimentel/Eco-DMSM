@@ -1,6 +1,8 @@
-from Models.DMOfferBook import OfferBook
+# from Models.DMOfferBook import OfferBook
+from src.dispatcher import Dispatcher
 
-
-ob = OfferBook.loadFromCache(testing=False)
-ob.print()
-ob.printOffers()
+print( Dispatcher.ExRates_getBase() )
+#
+# ob = OfferBook.loadFromCache(testing=False)
+# ob.print()
+# ob.printOffers()

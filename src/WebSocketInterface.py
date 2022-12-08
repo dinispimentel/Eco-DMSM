@@ -110,7 +110,7 @@ class WSInterface:
         try:
             async with websockets.serve(handler, host, port):
                 while not self.kill_event.is_set():
-                    await asyncio.sleep(0)
+                    await asyncio.sleep(1)
                 self.unbinded = True
             # await self.kill_event.wait()
         except TypeError as te:

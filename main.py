@@ -5,6 +5,7 @@ from http.server import HTTPServer
 from threading import Thread
 
 import redis
+import urllib3
 
 from src.DPHTTPRequestHandler import DPHTTPRequestHandler
 from src.config import Config
@@ -33,7 +34,6 @@ class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
 
 
 if __name__ == '__main__':
-
     # TODO:
     # TODO: ADICIONAR VERIFICAÇÃO DE INTEGRIDADE DO REDIS
     # TODO: VERIFICAR STATUS DO SITE

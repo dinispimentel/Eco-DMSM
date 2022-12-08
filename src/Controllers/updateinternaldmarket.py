@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import time
 from threading import Thread
 from typing import List, Dict, Type, Tuple
@@ -95,6 +96,7 @@ class UpdateInternalDMarket(BasicController):
             R.DMDataLocked()
             return
         jbody: dict = kwargs.get("jbody")
+        print(json.dumps(jbody))
         mp = UpdateInternalDMarket.check_params_missing(jbody)
         if len(mp) > 0:
             R.missingParams(mp)

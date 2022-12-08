@@ -153,7 +153,7 @@ Offer Count: {len(self.offers)}
         return True if len(flags_not_found) < 1 else False, flags_not_found
 
     def saveToCache(self, testing):
-        with open(Config.DMarket.OfferBook.Files.getSaveDir(testing=testing), "w") as f:
+        with open(Config.DMarket.OfferBook.Files.getSaveDir(testing=testing), "w+") as f:
             f.write(json.dumps(self.toDICT()))
 
     @staticmethod
@@ -184,7 +184,8 @@ Offer Count: {len(self.offers)}
         if targetcur not in cur_req:
             cur_req.append(targetcur)
 
-        Dispatcher.ExRates_forceUpdate(base=self.offers[0].dm_price.currency, currencies=cur_req)
+        if self.offers[0].dm_price.currency != Dispatcher.ExRates_getBase():
+            Dispatcher.ExRates_forceUpdate(base=self.offers[0].dm_price.currency, currencies=cur_req)
 
         rates = Dispatcher.ExRates_getRates()
 
