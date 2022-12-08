@@ -46,7 +46,7 @@ if __name__ == '__main__':
     from src.Models.DMData import DMData
     from src.Models.DMOfferBook import OfferBook
     from src.Models.ProxyOrchestrator import ProxyOrchestrator
-    DMData = DMData(offerbook=OfferBook.loadFromCache(testing=False))
+    DMData = DMData()  # offerbook=OfferBook.loadFromCache(testing=False)
     PO = ProxyOrchestrator.build_from_raw(PROXIES, method='socks5')
 
     handler = partial(DPHTTPRequestHandler, DMData, PO)
