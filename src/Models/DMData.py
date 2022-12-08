@@ -9,7 +9,7 @@ class DMData:
 
     def __init__(self, offerbook: OfferBook = None, lastUpdate=None, status=None, progress=None):
         self.locked: bool = False
-        self.offerbook: OfferBook = offerbook
+        self.offerbook: OfferBook = offerbook or OfferBook()
         self.lastUpdate: int = lastUpdate
         self.status: str = status or "Idle"
         self.progress: Callable[[float, int], bool] = progress  # em ratio [0 ; 1]
