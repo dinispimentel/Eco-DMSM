@@ -55,7 +55,7 @@ class Config:
                 """Para uso do updateinternaldmarketdata"""
                 ALLOWED_TYPES = ["dmarket", "p2p"]
                 ALLOWED_TF_CATEGORIES_PATH = ["knife", "rifle", "sniperrifle", "pistol", "smg", "shotgun", "machinegun"]
-                MAX_SINGLE_MAX_LIMIT = 200
+                MAX_SINGLE_MAX_LIMIT = 500
         class OfferBook:
 
             class Files:
