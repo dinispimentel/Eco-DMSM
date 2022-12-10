@@ -13,7 +13,7 @@ class SORTING:
 
         @staticmethod
         def InstantPriceGap(elem: Offer):
-            return elem.sm_price.value - (elem.dm_price.cValue or elem.dm_price.value)
+            return (elem.sm_price.cValue or elem.sm_price.value) - (elem.dm_price.cValue or elem.dm_price.value)
 
         @staticmethod
         def MidPriceGap(elem: Offer):
@@ -29,7 +29,7 @@ class SORTING:
 
         @staticmethod
         def InstantPriceGapRatio(elem: Offer):
-            return (elem.sm_price.value - (elem.dm_price.cValue or elem.dm_price.value)) / (elem.dm_price.cValue or elem.dm_price.value)
+            return ((elem.sm_price.cValue or elem.sm_price.value) - (elem.dm_price.cValue or elem.dm_price.value)) / (elem.dm_price.cValue or elem.dm_price.value)
 
         @staticmethod
         def MidPriceGapRatio(elem: Offer):
