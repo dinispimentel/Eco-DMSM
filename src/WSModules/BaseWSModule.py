@@ -37,6 +37,11 @@ class BaseWSModule:
         for is_in in is_intbs:
             await self.sendPastStatesToInstance(is_in[0], is_in[1])
 
+    async def send_end(self):
+        for instance_id in list(self.state_holder.instances_states.keys()):
+            from src.WebSocketInterface import WSInterface
+            res = WSInterface.create_response(True, {"end": "end"})
+            await self.get_instance_ws(instance_id).send(res)
 
     async def startAwaintingUpdates(self):
         if not self.awaiting:
