@@ -174,7 +174,7 @@ class SteamMarketScraper:
                 dict_itnid_histogram.update({ob.offers[offerIdx].steam_name_id: ob.offers[offerIdx].histogram})
             if progress_trigger:
                 progress_trigger(time.time())
-            ob.offers[offerIdx].sm_price = Price(ob.offers[offerIdx].histogram.bid,  # preço mais alto
+            ob.offers[offerIdx].sm_price = Price(ob.offers[offerIdx].histogram.bid,  # preço mais alto que o buyer compra auto
                                                  # que o comprador compra
                                                  ob.offers[offerIdx].histogram.currency)
 
