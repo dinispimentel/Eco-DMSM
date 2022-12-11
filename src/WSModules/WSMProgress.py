@@ -1,6 +1,7 @@
 from asyncio import Event
 from typing import Tuple, Type, Callable
 
+import websockets.exceptions
 from websockets.server import WebSocketServerProtocol
 
 from src.StateHolder.BaseStateHolder import BaseStateHolder
@@ -16,7 +17,10 @@ class WSMProgress (BaseWSModule):
                                                  'timestamp': state[1]
                                            })
         self.state_holder.increment_states_served_on_instance(instance_id, [state])
-        await self.get_instance_ws(instance_id).send(res)
+        try:
+            await self.get_instance_ws(instance_id).send(res)
+        except (websockets.exceptions.ConnectionClosedOK, BaseException, Exception):
+            self.state_holder.remove_instance(instance_id)
 
 
     def __init__(self, get_instance_ws: Callable[[int], WebSocketServerProtocol], trigger: Event, state_holder: Type[BaseStateHolder], *args, **kwargs):
