@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 from typing import List, Tuple, Callable
 
@@ -173,7 +174,7 @@ Offer Count: {len(self.offers)}
             if offer_limit < 1:
                 raise ArithmeticError("Limit must be greater than 1")
 
-            this_ob = self.__dict__
+            this_ob = copy.deepcopy(self.__dict__)
             this_ob.update({'offers': self.offers[offset:offer_limit + offset]})
             return OfferBook(**this_ob)
         except (IndexError, Exception):
