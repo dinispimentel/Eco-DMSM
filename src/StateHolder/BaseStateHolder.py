@@ -44,3 +44,6 @@ class BaseStateHolder:
 
         for iid in list(self.instances_states.keys()):
             await wsi.connects.get(iid).close()
+
+    def remove_instance(self, instance_id):
+        self.instances_states.pop(instance_id)
