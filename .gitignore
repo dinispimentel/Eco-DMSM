@@ -1,2 +1,4 @@
 .idea/
 __pycache__/
+/src/websocket-pkey.pem
+/src/websocket-cert.crt
