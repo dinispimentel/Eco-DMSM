@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os.path
 import random
+import ssl
 import time
 from threading import Thread
 from typing import Tuple, Dict, List, Type, Optional, Mapping
@@ -61,7 +63,7 @@ class WSInterface:
 
     async def _serve(self, modules_to_load: List[Tuple[Type[BaseWSModule], Type[BaseStateHolder], Optional[Tuple],
     Optional[Mapping]]],
-                     host="127.0.0.1", port=4000):
+                     host="192.168.0.120", port=4000):
 
         async def handler(ws, path):
 
@@ -108,7 +110,11 @@ class WSInterface:
 
         print("Starting serve")
         try:
-            async with websockets.serve(handler, host, port):
+            # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            # ssl_context.load_cert_chain(
+            #    '/home/dp/Desktop/EcoScraper/DMSM/src/websocket-cert.crt',
+            #     keyfile='/home/dp/Desktop/EcoScraper/DMSM/src/websocket-pkey.pem')
+            async with websockets.serve(handler, host, port): # , ssl=ssl_context
                 while not self.kill_event.is_set():
                     await asyncio.sleep(1)
                 self.unbinded = True
@@ -146,6 +152,7 @@ class WSInterface:
             except:
                 loop = asyncio.new_event_loop()
             loop.run_until_complete(m.sendPastStates())
+            loop.run_until_complete(m.send_end())
 
         self.stopModules()
         self.kill_event.set()
@@ -178,6 +185,7 @@ class WSInterface:
 
     def stopModules(self):
         for mm in self.modules:
+
             mm.stop()
 
     def getStateHolderOfModule(self, module: Type) -> BaseStateHolder:
