@@ -74,7 +74,7 @@ class Config:
             MAX_RETRIES = 3
             FORBIDDEN_TIMEOUT = 10
             DELAY_CONFIG = {
-                "delay": 1,  # 1.5
+                "delay": 5,  # 1.5
                 "instances_before_delay": 50  # 30
                             }
             ANNOTATE_IMMEDIATELY = True
