@@ -28,7 +28,7 @@ class ProxyOrchestrator:
             raise RuntimeError("ProxyOrchestrator: proxies não ficaram prontas a tempo")
 
     @staticmethod
-    def build_from_raw(arr: list[str], method='socks4') -> ProxyOrchestrator:
+    def build_from_raw(arr: list[str], method='socks5') -> ProxyOrchestrator:
         pList = []
 
         for sp in arr:

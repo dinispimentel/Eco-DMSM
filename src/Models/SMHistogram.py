@@ -32,11 +32,11 @@ class Histogram:
         try:
             highest_buy_order = float(raw.get("highest_buy_order"))/100
         except TypeError:
-            highest_buy_order = 2**31
+            highest_buy_order = 0
         try:
             lowest_sell_order = float(raw.get("lowest_sell_order"))/100
         except TypeError:
-            lowest_sell_order = 2**31
+            lowest_sell_order = 0
 
         return Histogram(bg, sg, highest_buy_order, lowest_sell_order, currency=currency)
 

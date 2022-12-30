@@ -46,7 +46,8 @@ class Dispatcher:
                     elif res.status_code < 400:
                         _ProxyToUse.clearStrikes()
                         return res
-
+            else:
+                print("resnone retrying")
 
             return Dispatcher.dispatch_proxified(the_request, PO)
 
@@ -69,6 +70,8 @@ class Dispatcher:
                 print(f'Removing cz {type(ex)} | {_ProxyToUse.checkLocked()}')
                 PO.removeBrokenProxy(_ProxyToUse)  # TODO AQUI AQUI
             return Dispatcher.dispatch_proxified(the_request, PO)
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def requestDMarketItemInfoByTitle(title, limit):
@@ -199,7 +202,13 @@ class Dispatcher:
         res = requests.post(Config.buildExRatesURL("/forceUpdate"), json=payload)
         if 200 > res.status_code >= 299:
             raise Exception(f"Não foi possível dar force update.\n {res.content}")
+    @staticmethod
+    def testHTTPPost(proxy_orchestrator: ProxyOrchestrator):
+        def the_request(p: Proxy) -> Response:
+            return requests.post('https://httpbin.org/post', json="{\"success\": true}",
+                                verify=False, proxies=p.getProxy())
 
+        return Dispatcher.dispatch_proxified(the_request, proxy_orchestrator)
     # OBSOLETE:
 
     # @staticmethod

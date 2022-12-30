@@ -50,7 +50,7 @@ if __name__ == '__main__':
     PO = ProxyOrchestrator.build_from_raw(PROXIES, method='socks5')
 
     handler = partial(DPHTTPRequestHandler, DMData, PO)
-    webServer = ThreadedHTTPServer(("192.168.0.120", 8082), handler)
+    webServer = ThreadedHTTPServer((Config.ENV.LOCAL_IP, 8082), handler)
 
     try:
         webServer_Thread = Thread(target=webServer.serve_forever)

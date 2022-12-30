@@ -7,7 +7,7 @@ class Config:
 
     class ENV:
         URL_PPREFIX = "http://"
-        LOCAL_IP = "192.168.0.120"
+        LOCAL_IP = "192.168.0.140"
 
     class ExRates:
         PORT = 8085
@@ -15,8 +15,8 @@ class Config:
 
     class Proxying:
 
-        TIME_OUT = (15, 15)  # write, read
-        REUSABILITY_TIMEOUT = 20  # secs
+        TIME_OUT = (5, 5)  # write, read
+        REUSABILITY_TIMEOUT = 5  # secs
         WAIT_FOR_PROXIES_TO_BE_REUSABLE_TIMER = 30
         TIME_OUT_STACKABLE_LOCK = 30  # isto * num de tentativas em segundos
         TOO_MANY_REQUESTS_STACKABLE_LOCK = 60
@@ -74,8 +74,8 @@ class Config:
             MAX_RETRIES = 3
             FORBIDDEN_TIMEOUT = 10
             DELAY_CONFIG = {
-                "delay": 1.5,  # 1.5
-                "instances_before_delay": 30  # 30
+                "delay": 0,  # 1.5
+                "instances_before_delay": 500  # 30
                             }
             ANNOTATE_IMMEDIATELY = True
 
@@ -84,15 +84,15 @@ class Config:
             MAX_RETRIES = 3
             FORBIDDEN_TIMEOUT = 15  # em segundos
             DELAY_CONFIG = {
-                "delay": 5,
-                "instances_before_delay": 50
+                "delay": 0,
+                "instances_before_delay": 500
             }
 
     class CurrencyConversion:
         AVAILABLE_CURRENCIES = ["ARS", "USD", "EUR", "TRY"]
 
     class Redis:
-        HOST = 'localhost'
+        HOST = '192.168.0.120'
         PORT = 6379
 
     @staticmethod
